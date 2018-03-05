@@ -24,9 +24,8 @@ require_model('factura_cliente.php');
 require_model('factura_proveedor.php');
 require_model('proveedor.php');
 
-class informe_347 extends fs_controller
+class informe_190 extends fs_controller
 {
-   public $cantidad;
    public $datos_cli;
    public $datos_pro;
    public $ejercicio;
@@ -37,17 +36,12 @@ class informe_347 extends fs_controller
    
    public function __construct()
    {
-      parent::__construct(__CLASS__, 'Modelo 347', 'informes');
+      parent::__construct(__CLASS__, 'Modelo 190', 'informes');
    }
    
    protected function private_core()
    {
-      $this->cantidad = 3005.06;
-      if( isset($_REQUEST['cantidad']) )
-      {
-         $this->cantidad = floatval($_REQUEST['cantidad']);
-      }
-      
+     
       $this->ejercicio = new ejercicio();
       $this->sejercicio = $this->ejercicio->get($this->empresa->codejercicio);
       if( isset($_REQUEST['ejercicio']) )
@@ -81,7 +75,7 @@ class informe_347 extends fs_controller
          }
          else
          {
-            $this->url_descarga = $this->url().'&ejercicio='.$this->sejercicio->codejercicio.'&examinar='.$this->examinar.'&cantidad='.$this->cantidad;
+            $this->url_descarga = $this->url().'&ejercicio='.$this->sejercicio->codejercicio.'&examinar='.$this->examinar;
          }
       }
       else
@@ -122,12 +116,14 @@ class informe_347 extends fs_controller
       {
          $sql = "SELECT codcliente, to_char(fecha,'FMMM') as mes, sum(total) as total
             FROM facturascli WHERE to_char(fecha,'FMYYYY') = ".$this->ejercicio->var2str($this->sejercicio->year())."
+            AND irpf <> 0 
             GROUP BY codcliente,mes ORDER BY codcliente;";
       }
       else
       {
          $sql = "SELECT codcliente, DATE_FORMAT(fecha, '%m') as mes, sum(total) as total
             FROM facturascli WHERE DATE_FORMAT(fecha, '%Y') = ".$this->ejercicio->var2str($this->sejercicio->year())."
+            AND irpf <> 0 
             GROUP BY codcliente,mes ORDER BY codcliente;";
       }
       
@@ -143,10 +139,7 @@ class informe_347 extends fs_controller
             }
             else if($d['codcliente'] != $fila['codcliente'])
             {
-               if($fila['total'] > $this->cantidad)
-               {
-                  $informe['filas'][] = $fila;
-               }
+               $informe['filas'][] = $fila;
                
                $fila['codcliente'] = $d['codcliente'];
                $fila['t1'] = 0;
@@ -175,10 +168,7 @@ class informe_347 extends fs_controller
          }
          
          /// comprobamos si hay que añadir el último elemento examinado
-         if($fila['total'] > $this->cantidad)
-         {
-            $informe['filas'][] = $fila;
-         }
+         $informe['filas'][] = $fila;
          
          /// rellenamos la información del cliente y los totales
          $cliente = new cliente();
@@ -282,10 +272,7 @@ class informe_347 extends fs_controller
                }
                else if($d['idsubcuenta'] != $fila['idsubcuenta'])
                {
-                  if($fila['total'] > $this->cantidad)
-                  {
-                     $informe['filas'][] = $fila;
-                  }
+                  $informe['filas'][] = $fila;
                   
                   $fila['idsubcuenta'] = $d['idsubcuenta'];
                   $fila['t1'] = 0;
@@ -314,10 +301,7 @@ class informe_347 extends fs_controller
             }
             
             /// comprobamos si hay que añadir el último elemento examinado
-            if($fila['total'] > $this->cantidad)
-            {
-               $informe['filas'][] = $fila;
-            }
+            $informe['filas'][] = $fila;
          }
       }
       
@@ -399,12 +383,14 @@ class informe_347 extends fs_controller
       {
          $sql = "SELECT codproveedor, to_char(fecha,'FMMM') as mes, sum(total) as total
             FROM facturasprov WHERE to_char(fecha,'FMYYYY') = ".$this->ejercicio->var2str($this->sejercicio->year())."
+            AND irpf <> 0 
             GROUP BY codproveedor, to_char(fecha,'FMMM') ORDER BY codproveedor;";
       }
       else
       {
          $sql = "SELECT codproveedor, DATE_FORMAT(fecha, '%m') as mes, sum(total) as total
             FROM facturasprov WHERE DATE_FORMAT(fecha, '%Y') = ".$this->ejercicio->var2str($this->sejercicio->year())."
+            AND irpf <> 0
             GROUP BY codproveedor, DATE_FORMAT(fecha, '%m') ORDER BY codproveedor;";
       }
       
@@ -419,10 +405,7 @@ class informe_347 extends fs_controller
             }
             else if($d['codproveedor'] != $fila['codproveedor'])
             {
-               if($fila['total'] > $this->cantidad)
-               {
-                  $informe['filas'][] = $fila;
-               }
+               $informe['filas'][] = $fila;
                
                $fila['codproveedor'] = $d['codproveedor'];
                $fila['t1'] = 0;
@@ -450,10 +433,7 @@ class informe_347 extends fs_controller
             $fila['total'] = $fila['t1'] + $fila['t2'] + $fila['t3'] + $fila['t4'];
          }
          
-         if($fila['total'] > $this->cantidad)
-         {
-            $informe['filas'][] = $fila;
-         }
+         $informe['filas'][] = $fila;
          
          $proveedor = new proveedor();
          foreach($informe['filas'] as $i => $value)
@@ -557,10 +537,7 @@ class informe_347 extends fs_controller
                }
                else if($d['idsubcuenta'] != $fila['idsubcuenta'])
                {
-                  if($fila['total'] > $this->cantidad)
-                  {
-                     $informe['filas'][] = $fila;
-                  }
+                  $informe['filas'][] = $fila;
                   
                   $fila['idsubcuenta'] = $d['idsubcuenta'];
                   $fila['t1'] = 0;
@@ -589,10 +566,7 @@ class informe_347 extends fs_controller
             }
             
             /// comprobamos si hay que añadir el último elemento examinado
-            if($fila['total'] > $this->cantidad)
-            {
-               $informe['filas'][] = $fila;
-            }
+            $informe['filas'][] = $fila;
          }
       }
       
@@ -656,7 +630,7 @@ class informe_347 extends fs_controller
       
       echo "<table>
          <tr>
-            <td colspan='10'>Clientes que han comprado mas de ".$this->cantidad." euros en el ejercicio ".$this->sejercicio->nombre.".</td>
+            <td colspan='10'>Modelo 190 en el ejercicio ".$this->sejercicio->nombre.".</td>
          </tr>
          <tr>
             <td>".FS_CIFNIF."</td>
